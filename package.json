@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.mjs",
-    "test": "node index.mjs"
+    "test": "node index.mjs & sleep 3 && kill $!"
   },
   "keywords": [],
   "author": "",
