@@ -19,6 +19,46 @@ const pool = mysql.createPool({
     waitForConnections: true
 });
 
+// query strings
+const add_new_user = 
+    `INSERT INTO users (username, password, first_name, last_name, ssn, birthdate, isDoctor)
+     VALUES
+     (?, ?, ?, ?, ?, ?, ?)`;
+
+const add_new_doctor = `
+    INSERT INTO doctors (user_id, specialty, practice_since)
+    VALUES
+    (?, ?, ?)`;
+
+const add_new_patient = `
+    INSERT INTO patient (user_id, street, city, state, zipcode, doctor_id)
+    VALUES
+    (?, ?, ?, ?, ?)`;
+
+const add_new_prescription = `
+    INSERT INTO prescription (doctor_id, patient_id, drug_name, refills)
+    VALUES
+    (?, ?, ?, ?)`;
+
+
+const is_user_a_doctor = 
+    `SELECT isDoctor
+     FROM users
+     WHERE id = ?
+    `;
+
+const get_patients_prescriptions = `
+    SELECT p.id, d.first_name AS doctor, p.drug_name, p.refills
+    FROM prescription p
+    JOIN users d on p.doctor_id = d.id
+    WHERE patient_id = ?`;
+
+const get_doctors_prescriptions = `
+    SELECT p.id, u.first_name AS patient, p.drug_name, p.refills
+    FROM prescription p
+    JOIN users u ON p.patient_id = u.id
+    WHERE p.doctor_id = ?`;
+
 //routes
 app.get('/', (req, res) => {
    res.send('Hello Express app!')
