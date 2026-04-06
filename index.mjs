@@ -59,6 +59,18 @@ const get_doctors_prescriptions = `
     JOIN users u ON p.patient_id = u.id
     WHERE p.doctor_id = ?`;
 
+const get_doctors_patients = `
+    SELECT p.user_id, u.first_name AS patient_first_name, u.last_name AS patient_last_name
+    FROM patient p
+    JOIN users u ON u.id = p.user_id
+    WHERE doctor_id = ?`;
+
+const get_patients_doctor = `
+    SELECT d.id, d.first_name, d.last_name
+    FROM patient p
+    JOIN users d on d.id = p.doctor_id
+    WHERE p.user_id = ?`
+
 //routes
 app.get('/', (req, res) => {
    res.send('Hello Express app!')
