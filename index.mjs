@@ -73,7 +73,7 @@ const get_patients_doctor = `
 
 //routes
 app.get('/', (req, res) => {
-   res.send('Hello Express app!')
+   res.render('login')
 });
 
 app.get("/dbTest", async(req, res) => {
