@@ -1,13 +1,22 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
+import bcrypt from 'bcrypt';
+import session from "express-session"
 
 const app = express();
-
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
 //for Express to get values using POST method
 app.use(express.urlencoded({extended:true}));
+
+app.set('trust proxy', 1); 
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true
+}))
+
 
 //setting up database connection pool
 const pool = mysql.createPool({
@@ -71,9 +80,48 @@ const get_patients_doctor = `
     JOIN users d on d.id = p.doctor_id
     WHERE p.user_id = ?`
 
+const get_account_info_by_username = `
+    SELECT *
+    FROM users
+    WHERE username = ?`;
+
 //routes
 app.get('/', (req, res) => {
    res.render('login')
+});
+
+app.post('/login', async (req, res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+    let passwordHash = "";
+
+    const [rows] = await pool.query(get_account_info_by_username, [username]);
+
+    if (rows.length > 0) {
+        passwordHash = rows[0].password;
+    }
+
+    let match = await bcrypt.compare(password, passwordHash);
+
+    console.log(rows[0]);
+    if (match) {
+        req.session.authenticated = true;
+        if (rows[0].isDoctor) {
+            res.redirect('/doctorPortal');
+        } else {
+            res.redirect('/patientPortal');
+        }
+    } else {
+        res.redirect('/');
+    }
+});
+
+app.get('/patientPortal', isAuthenticated, (req, res) => {
+    res.render('patient');
+});
+
+app.get('/doctorPortal', isAuthenticated, (req, res) => {
+    res.render('doctor');
 });
 
 app.get("/dbTest", async(req, res) => {
@@ -89,3 +137,11 @@ app.get("/dbTest", async(req, res) => {
 app.listen(3000, ()=>{
     console.log("Express server running")
 })
+
+function isAuthenticated(req, res, next) {
+    if (!req.session.authenticated) {
+        res.redirect('/');
+    } else {
+        next();
+    }
+}
