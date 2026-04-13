@@ -104,7 +104,7 @@ app.post('/login', async (req, res) => {
     let match = await bcrypt.compare(password, passwordHash);
 
     console.log(rows[0]);
-    if (password == rows[0].password) {
+    if (match) {
         req.session.authenticated = true;
         if (rows[0].isDoctor) {
             req.session.user = {
