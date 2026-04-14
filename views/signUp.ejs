@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription Plus</title>
+</head>
+<body>
+    <h1>REGISTRATION</h1>
+    <form method="POST" action="/signUp">
+        <input type="text" name="firstName" placeholder="First Name">
+        <input type="text" name="lastName" placeholder="Last Name"><br>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob" name="dob" required><br>
+        <input type="text" name="ssn" placeholder="Social Security Number"><br>
+        <label>User Type:</label>
+        <input type="radio" id="patient" name="userType" value="patient" required>
+        <label for="patient">Patient</label>
+
+        <input type="radio" id="doctor" name="userType" value="doctor">
+        <label for="doctor">Doctor</label><br>
+        <button type="submit">REGISTER NOW</button>
+    </form>
+
+    <p>
+        Already have an account?
+        <a href="/login">Login</a>
+    </p>
+</body>
+</html> 
