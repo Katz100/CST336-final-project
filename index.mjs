@@ -42,7 +42,7 @@ const add_new_doctor = `
 const add_new_patient = `
     INSERT INTO patient (user_id, street, city, state, zipcode, doctor_id)
     VALUES
-    (?, ?, ?, ?, ?)`;
+    (?, ?, ?, ?, ?, ?)`;
 
 const add_new_prescription = `
     INSERT INTO prescription (doctor_id, patient_id, drug_name, refills)
@@ -95,7 +95,39 @@ app.get('/signUp', (req, res) => {
 });
 
 app.post('/signUp', async function(req, res) {
-    // signup logic
+    let firstName = req.body.firstName.trim();
+    let lastName = req.body.lastName.trim();
+    let dob = req.body.dob;
+    let ssn = req.body.ssn.replace(/\D/g, "");
+    let userType = req.body.userType;
+    let isDoctor = userType === "doctor" ? 1 : 0;
+    let username = req.body.username;
+    let password = req.body.password;
+    let passwordConfirm = req.body.passwordConfirm;
+
+    if (password !== passwordConfirm) {
+        return res.send("Passwords do not match!");
+    }
+
+    let passwordHash = await bcrypt.hash(password, 10);
+
+    try {
+    await pool.query(add_new_user, [
+       username,
+       passwordHash,
+       firstName,
+       lastName,
+       ssn,
+       dob,
+       isDoctor
+    ]);
+
+    res.redirect('/login');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error creating account.");
+    }
+
 });
 
 app.get('/login', (req, res) => {
