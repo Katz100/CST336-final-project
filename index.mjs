@@ -98,6 +98,10 @@ app.post('/signUp', async function(req, res) {
     // signup logic
 });
 
+app.get('/login', (req, res) => {
+    res.render('login');
+});
+
 app.post('/login', async (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
