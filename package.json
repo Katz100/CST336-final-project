@@ -12,9 +12,17 @@
   "type": "commonjs",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "ejs": "^5.0.1",
+    "ejs": "^5.0.2",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "mysql2": "^3.20.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Katz100/CST336-final-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Katz100/CST336-final-project/issues"
+  },
+  "homepage": "https://github.com/Katz100/CST336-final-project#readme"
 }
