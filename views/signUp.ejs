@@ -7,14 +7,14 @@
 </head>
 <body>
     <h1>REGISTRATION</h1>
-    <form method="POST" action="/signUp">
-        <input type="text" name="firstName" placeholder="First Name">
-        <input type="text" name="lastName" placeholder="Last Name"><br>
+    <form id="signUpForm" method="POST" action="/signUp">
+        <input type="text" name="firstName" placeholder="First Name" required>
+        <input type="text" name="lastName" placeholder="Last Name" required><br>
         <label for="dob">Date of Birth:</label>
         <input type="date" id="dob" name="dob" required><br>
-        <input type="text" name="ssn" placeholder="Social Security Number"><br>
+        <input type="text" name="ssn" placeholder="Social Security Number" required><br>
         <label>User Type:</label>
-        <input type="radio" id="patient" name="userType" value="patient" required>
+        <input type="radio" id="patient" name="userType" value="patient">
         <label for="patient">Patient</label>
 
         <input type="radio" id="doctor" name="userType" value="doctor">
@@ -26,5 +26,6 @@
         Already have an account?
         <a href="/login">Login</a>
     </p>
+    <script src="/js/signUp.js"></script>
 </body>
 </html> 
