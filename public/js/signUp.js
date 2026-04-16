@@ -1,5 +1,25 @@
 const form = document.getElementById("signUpForm");
 
+const patientRadio = document.getElementById("patient");
+const doctorRadio = document.getElementById("doctor");
+const patientFields = document.getElementById("patientFields");
+const doctorFields = document.getElementById("doctorFields");
+
+function toggleUserFields() {
+    if (doctorRadio.checked) {
+        doctorFields.style.display = "block";
+        patientFields.style.display = "none";
+    } else if (patientRadio.checked) {
+        patientFields.style.display = "block";
+        doctorFields.style.display = "none";
+    } else {
+        patientFields.style.display = "none";
+        doctorFields.style.display = "none";
+    }
+}
+
+patientRadio.addEventListener("change", toggleUserFields);
+doctorRadio.addEventListener("change", toggleUserFields);
 form.addEventListener("submit", function(event){
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
@@ -35,6 +55,47 @@ form.addEventListener("submit", function(event){
 
     if (!patient && !doctor) {
         errorMessage += "Please select a user type.\n";
+    }
+
+    if (doctor) {
+        const specialty = document.getElementById("specialty").value.trim();
+        const practiceSince = document.getElementById("practiceSince").value;
+
+        if (specialty === "") {
+            errorMessage += "Specialty is required for doctors.\n";
+        }
+
+        if (practiceSince === "") {
+            errorMessage += "Practice Since year is required for doctors.\n";
+        }
+    }
+
+    if (patient) {
+        const street = document.getElementById("street").value.trim();
+        const city = document.getElementById("city").value.trim();
+        const state = document.getElementById("state").value.trim();
+        const zipcode = document.getElementById("zipcode").value.trim();
+        const doctorId = document.getElementById("doctorId").value;
+
+        if (street === "") {
+            errorMessage += "Street is required for patients.\n";
+        }
+
+        if (city === "") {
+            errorMessage += "City is required for patients.\n";
+        }
+
+        if (state === "") {
+            errorMessage += "State is required for patients.\n";
+        }
+
+        if (zipcode === "") {
+            errorMessage += "Zipcode is required for patients.\n";
+        }
+
+        if (doctorId === "") {
+            errorMessage += "Please select a doctor.\n";
+        }
     }
 
     if (username === "") {

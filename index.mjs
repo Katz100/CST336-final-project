@@ -85,13 +85,20 @@ const get_account_info_by_username = `
     FROM users
     WHERE username = ?`;
 
+const get_all_doctors = `
+    SELECT d.user_id AS id, u.first_name, u.last_name
+    FROM doctors d
+    JOIN users u ON d.user_id = u.id
+`;
+
 //routes
 app.get('/', (req, res) => {
    res.render('login')
 });
 
-app.get('/signUp', (req, res) => {
-    res.render('signUp');
+app.get('/signUp', async (req, res) => {
+    const [doctors] = await pool.query(get_all_doctors);
+    res.render('signUp', { doctors });
 });
 
 app.post('/signUp', async function(req, res) {
@@ -112,7 +119,7 @@ app.post('/signUp', async function(req, res) {
     let passwordHash = await bcrypt.hash(password, 10);
 
     try {
-    await pool.query(add_new_user, [
+        const [result] = await pool.query(add_new_user, [
        username,
        passwordHash,
        firstName,
@@ -121,6 +128,42 @@ app.post('/signUp', async function(req, res) {
        dob,
        isDoctor
     ]);
+
+    let userId = result.insertId;
+
+    if (isDoctor) {
+        let specialty = req.body.specialty;
+        let practiceSince = req.body.practiceSince;
+
+        if (!specialty || !practiceSince) {
+            return res.send("Doctor fields are required.");
+        }
+
+        await pool.query(add_new_doctor, [
+            userId,
+            specialty,
+            practiceSince
+        ]);
+    } else {
+            let street = req.body.street;
+            let city = req.body.city;
+            let state = req.body.state;
+            let zipcode = req.body.zipcode;
+            let doctorId = req.body.doctorId;
+
+            if (!street || !city || !state || !zipcode || !doctorId) {
+                return res.send("Patient fields are required.");
+            }
+
+            await pool.query(add_new_patient, [
+                userId,
+                street,
+                city,
+                state,
+                zipcode,
+                doctorId
+            ]);
+    }
 
     res.redirect('/login');
     } catch (err) {
