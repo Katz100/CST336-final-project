@@ -42,7 +42,7 @@ const add_new_doctor = `
 const add_new_patient = `
     INSERT INTO patient (user_id, street, city, state, zipcode, doctor_id)
     VALUES
-    (?, ?, ?, ?, ?)`;
+    (?, ?, ?, ?, ?, ?)`;
 
 const add_new_prescription = `
     INSERT INTO prescription (doctor_id, patient_id, drug_name, refills)
@@ -85,9 +85,96 @@ const get_account_info_by_username = `
     FROM users
     WHERE username = ?`;
 
+const get_all_doctors = `
+    SELECT d.user_id AS id, u.first_name, u.last_name
+    FROM doctors d
+    JOIN users u ON d.user_id = u.id
+`;
+
 //routes
 app.get('/', (req, res) => {
    res.render('login')
+});
+
+app.get('/signUp', async (req, res) => {
+    const [doctors] = await pool.query(get_all_doctors);
+    res.render('signUp', { doctors });
+});
+
+app.post('/signUp', async function(req, res) {
+    let firstName = req.body.firstName.trim();
+    let lastName = req.body.lastName.trim();
+    let dob = req.body.dob;
+    let ssn = req.body.ssn.replace(/\D/g, "");
+    let userType = req.body.userType;
+    let isDoctor = userType === "doctor" ? 1 : 0;
+    let username = req.body.username;
+    let password = req.body.password;
+    let passwordConfirm = req.body.passwordConfirm;
+
+    if (password !== passwordConfirm) {
+        return res.send("Passwords do not match!");
+    }
+
+    let passwordHash = await bcrypt.hash(password, 10);
+
+    try {
+        const [result] = await pool.query(add_new_user, [
+       username,
+       passwordHash,
+       firstName,
+       lastName,
+       ssn,
+       dob,
+       isDoctor
+    ]);
+
+    let userId = result.insertId;
+
+    if (isDoctor) {
+        let specialty = req.body.specialty;
+        let practiceSince = req.body.practiceSince;
+
+        if (!specialty || !practiceSince) {
+            return res.send("Doctor fields are required.");
+        }
+
+        await pool.query(add_new_doctor, [
+            userId,
+            specialty,
+            practiceSince
+        ]);
+    } else {
+            let street = req.body.street;
+            let city = req.body.city;
+            let state = req.body.state;
+            let zipcode = req.body.zipcode;
+            let doctorId = req.body.doctorId;
+
+            if (!street || !city || !state || !zipcode || !doctorId) {
+                return res.send("Patient fields are required.");
+            }
+
+            await pool.query(add_new_patient, [
+                userId,
+                street,
+                city,
+                state,
+                zipcode,
+                doctorId
+            ]);
+    }
+
+    res.redirect('/login');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error creating account.");
+    }
+
+});
+
+app.get('/login', (req, res) => {
+    res.render('login');
 });
 
 app.post('/login', async (req, res) => {
