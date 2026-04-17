@@ -1,73 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prescription Plus</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
+
 <body>
-    <div class="signUpCard">
-        <h1>REGISTRATION</h1>
-        <form id="signUpForm" method="POST" action="/signUp">
-            <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
-            <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
-            <label for="dob">Date of Birth:</label>
-            <input type="date" id="dob" name="dob" required>
-            <input type="text" id="ssn" name="ssn" placeholder="Social Security Number" required>
-            <label>User Type:</label>
-            <div class="radioGroup">
-                <label class="radioOption">
-                    <input type="radio" id="patient" name="userType" value="patient">
-                    Patient
-                </label>
+    <div class="content">
+        <div class="signUpCard">
+            <h1>REGISTRATION</h1>
+            <form id="signUpForm" method="POST" action="/signUp">
+                <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
+                <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" name="dob" required>
+                <input type="text" id="ssn" name="ssn" placeholder="Social Security Number" required>
+                <label>User Type:</label>
+                <div class="radioGroup">
+                    <label class="radioOption">
+                        <input type="radio" id="patient" name="userType" value="patient">
+                        Patient
+                    </label>
 
-                <label class="radioOption">
-                    <input type="radio" id="doctor" name="userType" value="doctor">
-                    Doctor
-                </label>
-            </div>
+                    <label class="radioOption">
+                        <input type="radio" id="doctor" name="userType" value="doctor">
+                        Doctor
+                    </label>
+                </div>
 
-            <div id="doctorFields" style="display: none;">
-                <h3>Doctor Information</h3>
-                <input type="text" id="specialty" name="specialty" placeholder="Specialty">
-                <label for="practiceSince">Practice Since:</label>
-                <input type="number" id="practiceSince" name="practiceSince" min="1900" max="2026" placeholder="YYYY">
-            </div>
+                <div id="doctorFields" style="display: none;">
+                    <h3>Doctor Information</h3>
+                    <input type="text" id="specialty" name="specialty" placeholder="Specialty">
+                    <label for="practiceSince">Practice Since:</label>
+                    <input type="number" id="practiceSince" name="practiceSince" min="1900" max="2026"
+                        placeholder="YYYY">
+                </div>
 
-            <div id="patientFields" style="display: none;">
-                <h3>Patient Information</h3>
-                <input type="text" id="street" name="street" placeholder="Street Address">
-                <input type="text" id="zipcode" name="zipcode" placeholder="Zipcode">
-                <input type="text" id="city" name="city" placeholder="City">
-                <input type="text" id="state" name="state" placeholder="State">
+                <div id="patientFields" style="display: none;">
+                    <h3>Patient Information</h3>
+                    <input type="text" id="street" name="street" placeholder="Street Address">
+                    <input type="text" id="zipcode" name="zipcode" placeholder="Zipcode">
+                    <input type="text" id="city" name="city" placeholder="City">
+                    <input type="text" id="state" name="state" placeholder="State">
 
-                <label for="doctorId">Doctor:</label>
-                <select id="doctorId" name="doctorId">
-                    <option value="">Select Doctor</option>
-                    <% doctors.forEach(function(doctor) { %>
-                        <option value="<%= doctor.id %>">
-                            Dr. <%= doctor.first_name %> <%= doctor.last_name %>
-                        </option>
-                    <% }); %>
-                </select>
-            </div>
+                    <label for="doctorId">Doctor:</label>
+                    <select id="doctorId" name="doctorId">
+                        <option value="">Select Doctor</option>
+                        <% doctors.forEach(function(doctor) { %>
+                            <option value="<%= doctor.id %>">
+                                Dr. <%= doctor.first_name %>
+                                    <%= doctor.last_name %>
+                            </option>
+                            <% }); %>
+                    </select>
+                </div>
 
-            <h3>Account Information</h3>
-            <div class="accountSection">
-                <input type="text" id="username" name="username" placeholder="Username" required>
-                <input type="password" id="password" name="password" placeholder="Password" required>
-                <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm Password" required>
-            </div>
+                <h3>Account Information</h3>
+                <div class="accountSection">
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                    <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm Password"
+                        required>
+                </div>
 
-            <button type="submit">REGISTER NOW</button>
-        </form>
+                <button type="submit">REGISTER NOW</button>
+            </form>
 
-        <p>
-            Already have an account?
-            <a href="/login">Login</a>
-        </p>
+            <p>
+                Already have an account?
+                <a href="/login">Login</a>
+            </p>
+        </div>
     </div>
+    <%- include('partials/footer') %>
     <script src="/js/signUp.js"></script>
 </body>
-</html> 
+
+</html>
