@@ -173,6 +173,12 @@ app.post('/signUp', async function(req, res) {
 
 });
 
+app.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/');
+    });
+});
+
 app.get('/login', (req, res) => {
     res.render('login');
 });
@@ -204,8 +210,32 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/patientPortal', isAuthenticated, isPatient, (req, res) => {
-    res.render('patient');
+app.get('/patientPortal', isAuthenticated, isPatient, async (req, res) => {
+    const userId = req.session.user.id;
+
+    try {
+        const [prescriptions] = await pool.query(
+            get_patients_prescriptions,
+            [userId]
+        );
+
+        const [doctorRows] = await pool.query(
+            get_patients_doctor,
+            [userId]
+        );
+
+        const doctor = doctorRows.length > 0 ? doctorRows[0] : null;
+
+        res.render('patient', {
+            user: req.session.user,
+            prescriptions,
+            doctor
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading patient portal");
+    }
 });
 
 app.get('/doctorPortal', isAuthenticated, isDoctor, (req, res) => {
