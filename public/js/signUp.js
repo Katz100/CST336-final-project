@@ -4,6 +4,7 @@ const patientRadio = document.getElementById("patient");
 const doctorRadio = document.getElementById("doctor");
 const patientFields = document.getElementById("patientFields");
 const doctorFields = document.getElementById("doctorFields");
+const zipcodeField = document.getElementById("zipcode");
 
 function toggleUserFields() {
     if (doctorRadio.checked) {
@@ -20,7 +21,20 @@ function toggleUserFields() {
 
 patientRadio.addEventListener("change", toggleUserFields);
 doctorRadio.addEventListener("change", toggleUserFields);
-form.addEventListener("submit", async function(event){
+zipcodeField.addEventListener("change", async function (event) {
+    const city = document.getElementById("city");
+    const state = document.getElementById("state");
+    const zipcode = document.getElementById("zipcode").value.trim();
+    const url = `https://api.zippopotam.us/us/${zipcode}`;
+    let response = await fetch(url);
+    let data = await response.json();
+
+    if (!(Object.keys(data).length === 0)) {
+        state.value = data.places[0].state;
+        city.value = data.places[0]["place name"];
+    }
+});
+form.addEventListener("submit", async function (event) {
     event.preventDefault();
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
@@ -48,7 +62,7 @@ form.addEventListener("submit", async function(event){
     if (ssn === "") {
         errorMessage += "Social Security Number is required.\n";
     } else {
-        const cleanSSN = ssn.replace(/\D/g,"");
+        const cleanSSN = ssn.replace(/\D/g, "");
         if (cleanSSN.length !== 9) {
             errorMessage += "Social Security Number MUST be 9 digits.\n";
         }
@@ -115,7 +129,7 @@ form.addEventListener("submit", async function(event){
     }
 
     if (password !== passwordConfirm) {
-        errorMessage += "Passwords do not match.\n";   
+        errorMessage += "Passwords do not match.\n";
     }
 
     if (errorMessage !== "") {
