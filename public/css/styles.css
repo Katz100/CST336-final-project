@@ -225,12 +225,6 @@ body {
   margin-top: 20px;
 }
 
-@media (max-width: 768px) {
-  .dashboard {
-    grid-template-columns: 1fr;
-  }
-}
-
 .card {
   background-color: #ffffff;
   padding: 20px;
@@ -250,7 +244,6 @@ body {
   margin-bottom: 15px;
 }
 
-/* Table styles */
 table {
   width: 100%;
   border-collapse: collapse;

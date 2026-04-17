@@ -9,27 +9,21 @@
 
 <body>
     <div class="portal-container">
-
-        <!-- Header -->
         <header class="portal-header">
             <h1>Patient Portal</h1>
 
-            <!-- Logout Button -->
             <form action="/logout" method="POST">
                 <button class="logout-btn">Logout</button>
             </form>
         </header>
 
-        <!-- Welcome Section -->
         <section class="welcome-section">
             <h2>Welcome, <%= user ? user.first_name : "Patient" %>!</h2>
             <p>Here you can view your prescriptions and doctor information.</p>
         </section>
 
-        <!-- Main Dashboard -->
         <main class="dashboard">
 
-            <!-- Doctor Info Card -->
             <div class="card">
                 <h3>Your Doctor</h3>
                 <% if (doctor) { %>
@@ -39,7 +33,6 @@
                 <% } %>
             </div>
 
-            <!-- Prescriptions Card -->
             <div class="card">
                 <h3>Your Prescriptions</h3>
 
