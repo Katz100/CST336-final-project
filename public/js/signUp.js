@@ -20,7 +20,8 @@ function toggleUserFields() {
 
 patientRadio.addEventListener("change", toggleUserFields);
 doctorRadio.addEventListener("change", toggleUserFields);
-form.addEventListener("submit", function(event){
+form.addEventListener("submit", async function(event){
+    event.preventDefault();
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
     const dob = document.getElementById("dob").value;
@@ -76,6 +77,9 @@ form.addEventListener("submit", function(event){
         const state = document.getElementById("state").value.trim();
         const zipcode = document.getElementById("zipcode").value.trim();
         const doctorId = document.getElementById("doctorId").value;
+        const url = `https://api.zippopotam.us/us/${zipcode}`;
+        let response = await fetch(url);
+        let data = await response.json();
 
         if (street === "") {
             errorMessage += "Street is required for patients.\n";
@@ -89,8 +93,8 @@ form.addEventListener("submit", function(event){
             errorMessage += "State is required for patients.\n";
         }
 
-        if (zipcode === "") {
-            errorMessage += "Zipcode is required for patients.\n";
+        if (zipcode === "" || Object.keys(data).length === 0) {
+            errorMessage += "Zipcode is blank or invalid.\n";
         }
 
         if (doctorId === "") {
@@ -115,8 +119,9 @@ form.addEventListener("submit", function(event){
     }
 
     if (errorMessage !== "") {
-        event.preventDefault();
         alert(errorMessage);
+        return;
     }
 
+    form.submit();
 });
