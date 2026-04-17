@@ -193,19 +193,10 @@ app.post('/login', async (req, res) => {
     console.log(rows[0]);
     if (match) {
         req.session.authenticated = true;
+        req.session.user = rows[0];
         if (rows[0].isDoctor) {
-            req.session.user = {
-                id: rows[0].id,
-                username: rows[0].username,
-                isDoctor: rows[0].isDoctor
-            };
             res.redirect('/doctorPortal');
         } else {
-            req.session.user = {
-                id: rows[0].id,
-                username: rows[0].username,
-                isDoctor: rows[0].isDoctor
-            };
             res.redirect('/patientPortal');
         }
     } else {
@@ -213,11 +204,11 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/patientPortal', isAuthenticated, (req, res) => {
+app.get('/patientPortal', isAuthenticated, isPatient, (req, res) => {
     res.render('patient');
 });
 
-app.get('/doctorPortal', isAuthenticated, (req, res) => {
+app.get('/doctorPortal', isAuthenticated, isDoctor, (req, res) => {
     let doctor_id = req.session.user.id;
     console.log("Doctor id: " + doctor_id);
     res.render('doctor');
@@ -240,6 +231,22 @@ app.listen(3000, ()=>{
 function isAuthenticated(req, res, next) {
     if (!req.session.authenticated) {
         res.redirect('/');
+    } else {
+        next();
+    }
+}
+
+function isDoctor(req, res, next) {
+    if (!req.session.user.isDoctor) {
+        res.redirect('/patientPortal');
+    } else {
+        next();
+    }
+}
+
+function isPatient(req, res, next) {
+    if (req.session.user.isDoctor) {
+        res.redirect('/doctorPortal');
     } else {
         next();
     }
