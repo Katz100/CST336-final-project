@@ -75,9 +75,11 @@ const get_doctors_patients = `
     WHERE doctor_id = ?`;
 
 const get_patients_doctor = `
-    SELECT d.id, d.first_name, d.last_name
+    SELECT 
+    u.first_name, u.last_name, d.specialty, d.practice_since
     FROM patient p
-    JOIN users d on d.id = p.doctor_id
+    JOIN users u ON u.id = p.doctor_id
+    JOIN doctors d ON d.user_id = u.id
     WHERE p.user_id = ?`
 
 const get_account_info_by_username = `

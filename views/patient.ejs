@@ -27,7 +27,9 @@
             <div class="card">
                 <h3>Your Doctor</h3>
                 <% if (doctor) { %>
-                    <p>Dr. <%= doctor.first_name %> <%= doctor.last_name %></p>
+                    <h4>Dr. <%= doctor.first_name %> <%= doctor.last_name %></h4>
+                    <p>Specialty: <%= doctor.specialty %></p>
+                    <p>Practicing Since: <%=doctor.practice_since %></p>
                 <% } else { %>
                     <p>No doctor assigned.</p>
                 <% } %>
@@ -49,7 +51,9 @@
                             <% prescriptions.forEach(p => { %>
                                 <tr>
                                     <td><%= p.doctor %></td>
-                                    <td><%= p.drug_name %></td>
+                                    <td><span class="drug-link" data-drug="<%= p.drug_name %>">
+                                        <%= p.drug_name %>
+                                    </span></td>
                                     <td><%= p.refills %></td>
                                 </tr>
                             <% }) %>
@@ -64,6 +68,21 @@
 
     </div>
 
+    <div id="drugModal" class="modal hidden">
+    <div class="modal-content">
+        
+        <span id="closeModal" class="close-btn">&times;</span>
+
+        <h2 id="drugTitle"></h2>
+
+        <p><span id="drugPurpose"></span></p>
+        <p><span id="drugWarnings"></span></p>
+        <p><span id="drugDescription"></span></p>
+
+    </div>
+    </div>
+
     <%- include('partials/footer') %>
+    <script src="/js/script.js"></script>
 </body>
 </html>
