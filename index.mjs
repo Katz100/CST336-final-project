@@ -75,9 +75,11 @@ const get_doctors_patients = `
     WHERE doctor_id = ?`;
 
 const get_patients_doctor = `
-    SELECT d.id, d.first_name, d.last_name
+    SELECT 
+    u.first_name, u.last_name, d.specialty, d.practice_since
     FROM patient p
-    JOIN users d on d.id = p.doctor_id
+    JOIN users u ON u.id = p.doctor_id
+    JOIN doctors d ON d.user_id = u.id
     WHERE p.user_id = ?`
 
 const get_account_info_by_username = `
@@ -173,6 +175,12 @@ app.post('/signUp', async function(req, res) {
 
 });
 
+app.post('/logout', (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/');
+    });
+});
+
 app.get('/login', (req, res) => {
     res.render('login');
 });
@@ -204,8 +212,32 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/patientPortal', isAuthenticated, isPatient, (req, res) => {
-    res.render('patient');
+app.get('/patientPortal', isAuthenticated, isPatient, async (req, res) => {
+    const userId = req.session.user.id;
+
+    try {
+        const [prescriptions] = await pool.query(
+            get_patients_prescriptions,
+            [userId]
+        );
+
+        const [doctorRows] = await pool.query(
+            get_patients_doctor,
+            [userId]
+        );
+
+        const doctor = doctorRows.length > 0 ? doctorRows[0] : null;
+
+        res.render('patient', {
+            user: req.session.user,
+            prescriptions,
+            doctor
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading patient portal");
+    }
 });
 
 app.get('/doctorPortal', isAuthenticated, isDoctor, (req, res) => {

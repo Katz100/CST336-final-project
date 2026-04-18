@@ -1,18 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Portal</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 
 <body>
-    <div class="content">
-        <h1>Patient</h1>
-    </div>
-    <%- include('partials/footer') %>
-</body>
+    <div class="portal-container">
+        <header class="portal-header">
+            <h1>Patient Portal</h1>
 
+            <form action="/logout" method="POST">
+                <button class="logout-btn">Logout</button>
+            </form>
+        </header>
+
+        <section class="welcome-section">
+            <h2>Welcome, <%= user ? user.first_name : "Patient" %>!</h2>
+            <p>Here you can view your prescriptions and doctor information.</p>
+        </section>
+
+        <main class="dashboard">
+
+            <div class="card">
+                <h3>Your Doctor</h3>
+                <% if (doctor) { %>
+                    <h4>Dr. <%= doctor.first_name %> <%= doctor.last_name %></h4>
+                    <p>Specialty: <%= doctor.specialty %></p>
+                    <p>Practicing Since: <%=doctor.practice_since %></p>
+                <% } else { %>
+                    <p>No doctor assigned.</p>
+                <% } %>
+            </div>
+
+            <div class="card">
+                <h3>Your Prescriptions</h3>
+
+                <% if (prescriptions && prescriptions.length > 0) { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Medication</th>
+                                <th>Refills</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% prescriptions.forEach(p => { %>
+                                <tr>
+                                    <td><%= p.doctor %></td>
+                                    <td><span class="drug-link" data-drug="<%= p.drug_name %>">
+                                        <%= p.drug_name %>
+                                    </span></td>
+                                    <td><%= p.refills %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <p>No prescriptions found.</p>
+                <% } %>
+            </div>
+
+        </main>
+
+    </div>
+
+    <div id="drugModal" class="modal hidden">
+    <div class="modal-content">
+        
+        <span id="closeModal" class="close-btn">&times;</span>
+
+        <h2 id="drugTitle"></h2>
+
+        <p><span id="drugPurpose"></span></p>
+        <p><span id="drugWarnings"></span></p>
+        <p><span id="drugDescription"></span></p>
+
+    </div>
+    </div>
+
+    <%- include('partials/footer') %>
+    <script src="/js/script.js"></script>
+</body>
 </html>
