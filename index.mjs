@@ -95,7 +95,7 @@ const get_all_doctors = `
 
 //routes
 app.get('/', (req, res) => {
-   res.render('login')
+   res.redirect('/login');
 });
 
 app.get('/signUp', async (req, res) => {
@@ -182,23 +182,25 @@ app.post('/logout', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.render('login');
+    res.render('login', { error: null, username: "" });
 });
 
 app.post('/login', async (req, res) => {
     let username = req.body.username;
     let password = req.body.password;
-    let passwordHash = "";
 
     const [rows] = await pool.query(get_account_info_by_username, [username]);
 
-    if (rows.length > 0) {
-        passwordHash = rows[0].password;
-    }
+    if (rows.length === 0) {
+    return res.render('login', { 
+        error: "Invalid username or password",
+        username: ""
+    });
+}
 
+    let passwordHash = rows[0].password;
     let match = await bcrypt.compare(password, passwordHash);
 
-    console.log(rows[0]);
     if (match) {
         req.session.authenticated = true;
         req.session.user = rows[0];
@@ -208,7 +210,10 @@ app.post('/login', async (req, res) => {
             res.redirect('/patientPortal');
         }
     } else {
-        res.redirect('/');
+        return res.render('login', { 
+            error: "Invalid username or password",
+            username: username
+        });
     }
 });
 
