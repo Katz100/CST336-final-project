@@ -25,53 +25,75 @@
 
         <main class="dashboard">
 
+            <!-- PATIENT LIST -->
             <div class="card">
                 <h3>Your Patients</h3>
 
-                <% if (patient) { %>
+                <% if (patients && patients.length > 0) { %>
 
-                    <h4><%= patient.patient_first_name %> <%= patient.patient_last_name %></h4>
+                    <% patients.forEach(p => { %>
+                        <div class="patient-block">
 
-                    <button id="toggle-info-btn">Additional Info</button>
+                            <h4><%= p.patient_first_name %> <%= p.patient_last_name %></h4>
 
-                    <div id="extra-info" style="display: none; margin-top: 10px;">
-                        <p><strong>Patient ID:</strong> <%= patient.user_id %></p>
-                        <p><strong>SSN:</strong> <%= patient.ssn %></p>
-                        <p><strong>Birthdate:</strong> <%= patient.birthdate %></p>
-                        <p><strong>Address:</strong></p>
-                        <p><%= patient.street %></p>
-                        <p><%= patient.city %>, <%= patient.state %> <%= patient.zipcode %></p>
-                    </div>
+                            <button class="toggle-info-btn">Additional Info</button>
 
-                    <br><br>
+                            <div class="extra-info" style="display: none; margin-top: 10px;">
+                                <p><strong>Patient ID:</strong> <%= p.user_id %></p>
+                                <p><strong>SSN:</strong> <%= p.ssn %></p>
+                                <p><strong>Birthdate:</strong> <%= p.birthdate %></p>
+                                <p><strong>Address:</strong></p>
+                                <p><%= p.street %></p>
+                                <p><%= p.city %>, <%= p.state %> <%= p.zipcode %></p>
+                            </div>
 
-                    <h4>Current Prescription(s):</h4>
-
-                    <% if (prescriptions && prescriptions.length > 0) { %>
-                        <% prescriptions.forEach(p => { %>
-                            <p><%= p.drug_name %></p>
-                            <p>Refills: <%= p.refills %></p>
-
-                            <p>
-                                <a href="/viewPrescription?id=<%= p.id %>">
-                                    <button>Edit Prescription</button>
-                                </a>
-                            </p>
-                        <% }) %>
-                    <% } else { %>
-                        <p>No prescriptions found.</p>
-                    <% } %>
-
-                    <p>
-                        <a href="/newPrescription">
-                            <button>Create New Prescription</button>
-                        </a>
-                    </p>
+                        </div>
+                    <% }) %>
 
                 <% } else { %>
                     <p>No patients assigned.</p>
                 <% } %>
+            </div>
 
+            <!-- PRESCRIPTIONS -->
+            <div class="card">
+                <h3>Patient Prescriptions</h3>
+
+                <% if (prescriptions && prescriptions.length > 0) { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Medication</th>
+                                <th>Refills</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% prescriptions.forEach(p => { %>
+                                <tr>
+                                    <td><%= p.patient_first_name %> <%= p.patient_last_name %></td>
+                                    <td>
+                                        <span class="drug-link" data-drug="<%= p.drug_name %>">
+                                            <%= p.drug_name %>
+                                        </span>
+                                    </td>
+                                    <td><%= p.refills %></td>
+                                    <td><a href="/viewPrescription?id=<%= p.id %>" class="button">Edit</a></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+
+    
+
+                <% } else { %>
+                    <p>No prescriptions found.</p>
+                    <br>
+                <% } %>
+                <a href="/newPrescription">
+                        <button>Create New Prescription</button>
+                    </a>
             </div>
 
         </main>
@@ -79,15 +101,13 @@
     </div>
 
     <script>
-        const btn = document.getElementById("toggle-info-btn");
-        const extra = document.getElementById("extra-info");
-
-        if (btn) {
+        // Toggle for each patient
+        document.querySelectorAll(".toggle-info-btn").forEach(btn => {
             btn.addEventListener("click", () => {
-                extra.style.display = extra.style.display === "none" ? "block" : "none";
+                const info = btn.nextElementSibling;
+                info.style.display = info.style.display === "none" ? "block" : "none";
             });
-        }
+        });
     </script>
-
 </body>
 </html>
