@@ -9,10 +9,63 @@
 </head>
 
 <body>
-    <div class="content">
-        <h1>Doctor</h1>
-    </div>
-    <%- include('partials/footer') %>
-</body>
+    <div class="portal-container">
+        <header class="portal-header">
+            <h1>Doctor Portal</h1>
 
-</html>
+            <form action="/logout" method="POST">
+                <button class="logout-btn">Logout</button>
+            </form>
+        </header>
+
+        <section class="welcome-section">
+            <h2>Welcome, Dr. <%= user?.last_name || "" %>!</h2>
+            <p>Here you can view your patients' information.</p>
+        </section>
+
+        <main class="dashboard">
+
+            <div class="card">
+                <h3>Your Patients</h3>
+                <% if (patient) { %>
+                    <h4> <%= patient.patient_first_name %> <%= patient.patient_last_name %></h4>
+                    <button id="toggle-info-btn">Additional Info</button>
+                    <div id="extra-info" style="display: none; margin-top: 10px;">
+                    <p><strong>Patient ID:</strong> <%= patient.user_id %></p>
+                    <p><strong>SSN: </strong> <%=patient.ssn %></p>
+                    <p><strong>Birthdate:</strong> <%= patient.birthdate %></p>
+                    <p><strong>Address:</strong></p>
+                    <p> <%= patient.street %> </p>
+                    <p> <%= patient.city %>, <%= patient.state %> <%= patient.zipcode %> </p>
+  
+        </div>
+
+                    <br><br>
+            <h4>Current Presciption(s):</h4>
+            <% if (prescriptions && prescriptions.length > 0) { %>
+                <% prescriptions.forEach(p => { %>
+                    <p><%= p.drug_name %></p>
+                    <p> Refills: <%= p.refills %> </p>
+                <% }) %>
+            <% } else { %>
+                <p>No prescriptions found.</p>
+            <% } %>
+
+            <p><button> Edit Prescription(s) </button></p>
+            <p><a href="/newPrescription"><button>Create New Prescription</button></a></p>
+                        
+                <% } else { %>
+                    <p>No patients assigned.</p>
+                <% } %>
+            </div>
+            
+<script>
+    const btn = document.getElementById("toggle-info-btn");
+    const extra = document.getElementById("extra-info");
+
+    if (btn) {
+        btn.addEventListener("click", () => {
+            extra.style.display = extra.style.display === "none" ? "block" : "none";
+        });
+    }
+</script>

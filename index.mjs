@@ -69,7 +69,7 @@ const get_doctors_prescriptions = `
     WHERE p.doctor_id = ?`;
 
 const get_doctors_patients = `
-    SELECT p.user_id, u.first_name AS patient_first_name, u.last_name AS patient_last_name
+    SELECT p.user_id, u.birthdate, u.ssn, u.first_name AS patient_first_name, u.last_name AS patient_last_name, p.street, p.city, p.state, p.zipcode
     FROM patient p
     JOIN users u ON u.id = p.user_id
     WHERE doctor_id = ?`;
@@ -240,10 +240,42 @@ app.get('/patientPortal', isAuthenticated, isPatient, async (req, res) => {
     }
 });
 
-app.get('/doctorPortal', isAuthenticated, isDoctor, (req, res) => {
+app.get('/doctorPortal', isAuthenticated, isDoctor, async (req, res) => {
     let doctor_id = req.session.user.id;
     console.log("Doctor id: " + doctor_id);
-    res.render('doctor');
+    try {
+        const [prescriptions] = await pool.query(
+            get_doctors_prescriptions,
+            [doctor_id]
+        );
+
+        const [patientRows] = await pool.query(
+            get_doctors_patients,
+            [doctor_id]
+        );
+
+        const patient = patientRows.length > 0 ? patientRows[0] : null;
+        if (patient && patient.birthdate) {
+            const date = new Date(patient.birthdate);
+
+            // Format as MM/DD/YYYY
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+            const year = date.getFullYear();
+
+            patient.birthdate = `${month}/${day}/${year}`;
+        }
+
+        res.render('doctor', {
+            user: req.session.user,
+            prescriptions,
+            patient
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading doctor portal");
+    }
 });
 
 app.get('/newPrescription', isAuthenticated, isDoctor, async (req, res) => {
@@ -267,6 +299,10 @@ app.post('/newPrescription', isAuthenticated, isDoctor, async (req, res) => {
 
     res.redirect('/doctorPortal');
 });
+
+app.get('/editPrescription', isAuthenticated, isDoctor, async (req, res) => {
+
+}
 
 app.get("/dbTest", async(req, res) => {
    try {
