@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Prescription Plus</title>
+</head>
+
+<body>
+    <div class="content">
+        <div class="signUpCard">
+            <h1>EDIT PRESCRIPTION</h1>
+<form id="signUpForm" method="POST" action="/viewPrescription">
+
+    <input 
+        type="text" 
+        name="drugName" 
+        placeholder="Drug Name" 
+        value="<%= prescription ? prescription.drug_name : '' %>" 
+        required
+    >
+
+    <input 
+        type="number" 
+        name="refills" 
+        placeholder="Refills" 
+        value="<%= prescription ? prescription.refills : '' %>" 
+        required
+    >
+
+<select name="patient_id" required>
+    <% patients.forEach(p => { %>
+        <option 
+            value="<%= p.user_id %>" 
+            <%= prescription && prescription.patient_id === p.user_id ? "selected" : "" %>
+        >
+            <%= p.patient_first_name %> <%= p.patient_last_name %>
+        </option>
+    <% }) %>
+</select>
+
+
+    <!-- Hidden field so POST knows which prescription to update -->
+    <input type="hidden" name="prescription_id" value="<%= prescription.id %>">
+
+
+    <button type="submit">Update Prescription</button>
+</form>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+
+</html>

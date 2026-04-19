@@ -93,7 +93,26 @@ const get_all_doctors = `
     JOIN users u ON d.user_id = u.id
 `;
 
+const get_single_prescription = `
+    SELECT p.*, u.first_name AS patient_first_name, u.last_name AS patient_last_name
+    FROM prescription p
+    JOIN users u ON u.id = p.patient_id
+    WHERE p.id = ?
+`;
+
+const update_prescription = `
+    UPDATE prescription
+    SET patient_id = ?, drug_name = ?, refills = ?
+    WHERE id = ?
+`;
+
+
+
 //routes
+app.get('/test', (req, res) => {
+    res.send('working');
+});
+
 app.get('/', (req, res) => {
    res.render('login')
 });
@@ -300,9 +319,44 @@ app.post('/newPrescription', isAuthenticated, isDoctor, async (req, res) => {
     res.redirect('/doctorPortal');
 });
 
-app.get('/editPrescription', isAuthenticated, isDoctor, async (req, res) => {
+app.get('/viewPrescription', isAuthenticated, isDoctor, async (req, res) => {
+    try {
+        const doctor_id = req.session.user.id;
+        const prescriptionId = req.query.id;
 
-}
+        if (!prescriptionId) {
+            return res.send("Missing prescription ID");
+        }
+
+        const [patients] = await pool.query(get_doctors_patients, [doctor_id]);
+
+        const [prescriptionRows] = await pool.query(get_single_prescription, [prescriptionId]);
+        const prescription = prescriptionRows.length > 0 ? prescriptionRows[0] : null;
+
+        res.render('viewPrescription', {
+            patients,
+            prescription
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error");
+    }
+});
+app.post('/viewPrescription', isAuthenticated, isDoctor, async (req, res) => {
+    const doctor_id = req.session.user.id;
+    const prescriptionId = parseInt(req.body.prescription_id);
+    const patientId = parseInt(req.body.patient_id);
+    const drugName = req.body.drugName;
+    const refills = req.body.refills;
+
+    const params = [patientId, drugName, refills, prescriptionId];
+
+    await pool.query(update_prescription, params);
+
+    res.redirect('/doctorPortal');
+});
+
 
 app.get("/dbTest", async(req, res) => {
    try {
