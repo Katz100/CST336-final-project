@@ -16,6 +16,7 @@
                 <input type="text" id="firstName" name="drugName" placeholder="Drug Name" required>
                 <input type="number" id="lastName" name="refills" placeholder="Refills" required>
                 <select id="doctorId" name="patient_id" required>
+                    <option value="">Select Patient</option>
                     <% patients.forEach(function(patient) { %>
                         <option value="<%= patient.user_id %>">
                             <%= patient.patient_first_name %>
