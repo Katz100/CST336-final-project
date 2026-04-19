@@ -246,6 +246,28 @@ app.get('/doctorPortal', isAuthenticated, isDoctor, (req, res) => {
     res.render('doctor');
 });
 
+app.get('/newPrescription', isAuthenticated, isDoctor, async (req, res) => {
+    let doctor_id = req.session.user.id;
+
+    const [rows] = await pool.query(get_doctors_patients, [doctor_id]);
+
+    console.log(rows);
+    res.render('newPrescription', {patients: rows});
+});
+
+app.post('/newPrescription', isAuthenticated, isDoctor, async (req, res) => {
+    let doctor_id = req.session.user.id;
+    let drugName = req.body.drugName;
+    let refills = req.body.refills;
+    let patientId = parseInt(req.body.patient_id);
+
+    const params = [doctor_id, patientId, drugName, refills];
+
+    await pool.query(add_new_prescription, params);
+
+    res.redirect('/doctorPortal');
+});
+
 app.get("/dbTest", async(req, res) => {
    try {
         const [rows] = await pool.query("SELECT CURDATE()");
