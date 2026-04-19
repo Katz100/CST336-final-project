@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Prescription Plus</title>
+</head>
+
+<body>
+    <div class="content">
+        <div class="signUpCard">
+            <h1>NEW PRESCRIPTION</h1>
+            <form id="signUpForm" method="POST" action="/newPrescription">
+                <input type="text" id="firstName" name="drugName" placeholder="Drug Name" required>
+                <input type="number" id="lastName" name="refills" placeholder="Refills" required>
+                <select id="doctorId" name="patient_id" required>
+                    <% patients.forEach(function(patient) { %>
+                        <option value="<%= patient.user_id %>">
+                            <%= patient.patient_first_name %>
+                                <%= patient.patient_last_name %>
+                        </option>
+                        <% }) %>
+                </select>
+                <button type="submit">Create New Prescription</button>
+            </form>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+
+</html>
