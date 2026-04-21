@@ -63,13 +63,13 @@ const get_patients_prescriptions = `
     WHERE patient_id = ?`;
 
 const get_doctors_prescriptions = `
-    SELECT p.id, u.first_name AS patient, p.drug_name, p.refills
+    SELECT p.id, u.first_name AS patient_first_name, u.last_name AS patient_last_name, p.drug_name, p.refills
     FROM prescription p
     JOIN users u ON p.patient_id = u.id
     WHERE p.doctor_id = ?`;
 
 const get_doctors_patients = `
-    SELECT p.user_id, u.first_name AS patient_first_name, u.last_name AS patient_last_name
+    SELECT p.user_id, u.birthdate, u.ssn, u.first_name AS patient_first_name, u.last_name AS patient_last_name, p.street, p.city, p.state, p.zipcode
     FROM patient p
     JOIN users u ON u.id = p.user_id
     WHERE doctor_id = ?`;
@@ -93,7 +93,26 @@ const get_all_doctors = `
     JOIN users u ON d.user_id = u.id
 `;
 
+const get_single_prescription = `
+    SELECT p.*, u.first_name AS patient_first_name, u.last_name AS patient_last_name
+    FROM prescription p
+    JOIN users u ON u.id = p.patient_id
+    WHERE p.id = ?
+`;
+
+const update_prescription = `
+    UPDATE prescription
+    SET patient_id = ?, drug_name = ?, refills = ?
+    WHERE id = ?
+`;
+
+
+
 //routes
+app.get('/test', (req, res) => {
+    res.send('working');
+});
+
 app.get('/', (req, res) => {
    res.redirect('/login');
 });
@@ -245,11 +264,33 @@ app.get('/patientPortal', isAuthenticated, isPatient, async (req, res) => {
     }
 });
 
-app.get('/doctorPortal', isAuthenticated, isDoctor, (req, res) => {
+app.get('/doctorPortal', isAuthenticated, isDoctor, async (req, res) => {
     let doctor_id = req.session.user.id;
     console.log("Doctor id: " + doctor_id);
-    res.render('doctor');
+
+    try {
+        const [prescriptions] = await pool.query(
+            get_doctors_prescriptions,
+            [doctor_id]
+        );
+
+        const [patients] = await pool.query(
+            get_doctors_patients,
+            [doctor_id]
+        );
+
+        res.render('doctor', {
+            user: req.session.user,
+            prescriptions,
+            patients
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading doctor portal");
+    }
 });
+
 
 app.get('/newPrescription', isAuthenticated, isDoctor, async (req, res) => {
     let doctor_id = req.session.user.id;
@@ -272,6 +313,95 @@ app.post('/newPrescription', isAuthenticated, isDoctor, async (req, res) => {
 
     res.redirect('/doctorPortal');
 });
+
+app.get('/viewPrescription', isAuthenticated, isDoctor, async (req, res) => {
+    try {
+        const doctor_id = req.session.user.id;
+        const prescriptionId = req.query.id;
+
+        if (!prescriptionId) {
+            return res.send("Missing prescription ID");
+        }
+
+        const [patients] = await pool.query(get_doctors_patients, [doctor_id]);
+
+        const [prescriptionRows] = await pool.query(get_single_prescription, [prescriptionId]);
+        const prescription = prescriptionRows.length > 0 ? prescriptionRows[0] : null;
+
+        res.render('viewPrescription', {
+            patients,
+            prescription
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server error");
+    }
+});
+app.post('/viewPrescription', isAuthenticated, isDoctor, async (req, res) => {
+    const doctor_id = req.session.user.id;
+    const prescriptionId = parseInt(req.body.prescription_id);
+    const patientId = parseInt(req.body.patient_id);
+    const drugName = req.body.drugName;
+    const refills = req.body.refills;
+
+    const params = [patientId, drugName, refills, prescriptionId];
+
+    await pool.query(update_prescription, params);
+
+    res.redirect('/doctorPortal');
+});
+
+app.get('/deletePrescription', isAuthenticated, isDoctor, async (req, res) => {
+    const id = req.query.id;
+
+    try {
+        await pool.query("DELETE FROM prescription WHERE id = ?", [id]);
+        res.redirect('/doctorPortal');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error deleting prescription");
+    }
+});
+
+app.get('/viewPatient', isAuthenticated, isDoctor, async (req, res) => {
+    const doctor_id = req.session.user.id;
+    const patient_id = req.query.id;
+
+    try {
+        const [patients] = await pool.query(
+            get_doctors_patients,
+            [doctor_id]
+        );
+        const [prescriptions] = await pool.query(
+            get_patients_prescriptions,
+            [patient_id]
+        );
+        // Format birthdates
+        patients.forEach(p => {
+            if (p.birthdate) {
+                const date = new Date(p.birthdate);
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+                const year = date.getFullYear();
+                p.birthdate = `${month}/${day}/${year}`;
+            }
+        });
+
+        const patient = patients.find(p => p.user_id == patient_id);
+
+        res.render('viewPatient', {
+            user: req.session.user,
+            patient,
+            prescriptions
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading patient information");
+    }
+    
+});
+
 
 app.get("/dbTest", async(req, res) => {
    try {

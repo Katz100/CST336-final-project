@@ -303,3 +303,22 @@ tr:hover {
     cursor: pointer;
     text-decoration: underline;
 }
+button.delete-btn {
+    background: #d11a2a;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+    .delete-btn:hover {
+        background: #b21624; /* slightly darker on hover */
+    }
+.patient-caption {
+    font-style: italic;
+    font-size: 0.85em;
+    color: dimgrey;
+}

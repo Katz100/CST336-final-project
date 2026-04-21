@@ -4,15 +4,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Doctor Portal</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 
 <body>
-    <div class="content">
-        <h1>Doctor</h1>
+    <div class="portal-container">
+        <header class="portal-header">
+            <h1>Doctor Portal</h1>
+
+            <form action="/logout" method="POST">
+                <button class="logout-btn">Logout</button>
+            </form>
+        </header>
+
+        <section class="welcome-section">
+            <h2>Welcome, Dr. <%= user?.last_name || "" %>!</h2>
+            <p>Here you can view your patients' information.</p>
+        </section>
+
+        <main class="dashboard">
+
+            <!-- PATIENT LIST -->
+            <div class="card">
+                <h3>Your Patients</h3>
+                <div class="patient-caption"> Click patient's name to view additional information. </div>
+
+                <% if (patients && patients.length > 0) { %>
+
+                    <% patients.forEach(p => { %>
+                        <div class="patient-block">
+
+                            <a href="/viewPatient?id=<%=p.user_id%>"><h4><%= p.patient_first_name %> <%= p.patient_last_name %></h4></a>
+
+
+                        </div>
+                    <% }) %>
+
+                <% } else { %>
+                    <p>No patients assigned.</p>
+                <% } %>
+            </div>
+
+            <!-- PRESCRIPTIONS -->
+            <div class="card">
+                <h3>Patient Prescriptions</h3>
+
+                <% if (prescriptions && prescriptions.length > 0) { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Medication</th>
+                                <th>Refills</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% prescriptions.forEach(p => { %>
+                                <tr>
+                                    <td><%= p.patient_first_name %> <%= p.patient_last_name %></td>
+                                    <td>
+                                        <span class="drug-link" data-drug="<%= p.drug_name %>">
+                                            <%= p.drug_name %>
+                                        </span>
+                                    </td>
+                                    <td><%= p.refills %></td>
+                                    <td><a href="/viewPrescription?id=<%= p.id %>" class="button">Edit</a></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+
+    
+
+                <% } else { %>
+                    <p>No prescriptions found.</p>
+                    <br>
+                <% } %>
+                <a href="/newPrescription">
+                        <button>Create New Prescription</button>
+                    </a>
+            </div>
+
+        </main>
+
     </div>
     <%- include('partials/footer') %>
 </body>
-
 </html>
