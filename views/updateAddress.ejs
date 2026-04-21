@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Prescription Plus</title>
+</head>
+
+<body>
+    <div class="content">
+        <div class="signUpCard">
+            <h1>EDIT ADDRESS</h1>
+            <form id="signUpForm" method="POST" action="/updateAddress">
+
+            <input 
+                type="text" 
+                name="street" 
+                placeholder="Street Address" 
+                value="<%= patient ? patient.street : '' %>" 
+                required
+            >
+
+            <input 
+                type="text" 
+                name="zipcode" 
+                placeholder="Zipcode" 
+                value="<%= patient ? patient.zipcode: '' %>" 
+                required
+            >
+
+            <input 
+                type="text" 
+                name="city" 
+                placeholder="City" 
+                value="<%= patient ? patient.city : '' %>" 
+                required
+            >
+            <input 
+                type="text" 
+                name="state" 
+                placeholder="State" 
+                value="<%= patient ? patient.state : '' %>" 
+                required
+            >
+            <button class="signup-btn"> Update Address </button>
+    </div>
+    </div>
+
+        <script>
+        document.getElementById("update-btn").addEventListener("click", () => {
+            if (confirm("Is the below information correct?")) {
+                e.preventDefault();
+            }
+        });
+    </script>
+    
+</body>
+<%- include('partials/footer') %>
+</html>

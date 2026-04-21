@@ -322,3 +322,26 @@ button.delete-btn {
     font-size: 0.85em;
     color: dimgrey;
 }
+
+.personal-info {
+    background-color: #ffffff;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.personal-info h3 {
+    color: #2980b9;
+}
+.info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.address-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
