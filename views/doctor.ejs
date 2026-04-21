@@ -28,24 +28,15 @@
             <!-- PATIENT LIST -->
             <div class="card">
                 <h3>Your Patients</h3>
+                <div class="patient-caption"> Click patient's name to view additional information. </div>
 
                 <% if (patients && patients.length > 0) { %>
 
                     <% patients.forEach(p => { %>
                         <div class="patient-block">
 
-                            <h4><%= p.patient_first_name %> <%= p.patient_last_name %></h4>
+                            <a href="/viewPatient?id=<%=p.user_id%>"><h4><%= p.patient_first_name %> <%= p.patient_last_name %></h4></a>
 
-                            <button class="toggle-info-btn">Additional Info</button>
-
-                            <div class="extra-info" style="display: none; margin-top: 10px;">
-                                <p><strong>Patient ID:</strong> <%= p.user_id %></p>
-                                <p><strong>SSN:</strong> <%= p.ssn %></p>
-                                <p><strong>Birthdate:</strong> <%= p.birthdate %></p>
-                                <p><strong>Address:</strong></p>
-                                <p><%= p.street %></p>
-                                <p><%= p.city %>, <%= p.state %> <%= p.zipcode %></p>
-                            </div>
 
                         </div>
                     <% }) %>
@@ -99,15 +90,6 @@
         </main>
 
     </div>
-
-    <script>
-        // Toggle for each patient
-        document.querySelectorAll(".toggle-info-btn").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const info = btn.nextElementSibling;
-                info.style.display = info.style.display === "none" ? "block" : "none";
-            });
-        });
-    </script>
+    <%- include('partials/footer') %>
 </body>
 </html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Information</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <div class="portal-container">
+        <header class="portal-header">
+            <h1>Patient Information</h1>
+
+            <form action="/logout" method="POST">
+                <button class="logout-btn">Logout</button>
+            </form>
+        </header>
+        <main class="dashboard">
+        <!-- PATIENT INFO -->
+        <div class="card">
+            <h3><%=patient.patient_first_name%> <%=patient.patient_last_name%></h3>
+            <img src="/img/no-icon.png" width = 200>
+            <div class="extra-info"; margin-top: 10px;">
+                <p><strong>Patient ID:</strong> <%= patient.user_id %></p>
+                <p><strong>SSN:</strong> <%=patient.ssn %></p>
+                <p><strong>Birthdate:</strong> <%= patient.birthdate %></p>
+                <p><strong>Address:</strong></p>
+                <p><%= patient.street %></p>
+                <p><%= patient.city %>, <%= patient.state %> <%= patient.zipcode %></p>
+            </div>
+        </div>
+        <!-- PATIENT PRESCTIPTIONS -->
+        <div class="card">
+            <h3> Current Prescriptions </h3>
+            <% if (prescriptions && prescriptions.length > 0) { %>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Prescription ID</th>
+                            <th>Medication</th>
+                            <th>Refills</th>
+                            <th>Actions</th>
+                         </tr>
+                     </thead>
+                     <tbody>
+                        <% prescriptions.forEach(p => { %>
+                        <tr>
+                            <td><%= p.id %></td>
+                            <td>
+                                <span class="drug-link" data-drug="<%= p.drug_name %>">
+                                    <%= p.drug_name %>
+                                </span>
+                            </td>
+                            <td><%= p.refills %></td>
+                            <td><a href="/viewPrescription?id=<%= p.id %>" class="button">Edit</a></td>
+                        </tr>
+                            <% }) %>
+                     </tbody>
+                    </table>
+
+                <% } else { %>
+                    <p>No prescriptions found.</p>
+                    <br>
+                <% } %>
+                <a href="/newPrescription">
+                        <button>Create New Prescription</button>
+                    </a>
+        </div>
+    </main>
+    </body>
+    <%- include('partials/footer') %>
+    </html>

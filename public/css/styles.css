@@ -317,3 +317,8 @@ button.delete-btn {
     .delete-btn:hover {
         background: #b21624; /* slightly darker on hover */
     }
+.patient-caption {
+    font-style: italic;
+    font-size: 0.85em;
+    color: dimgrey;
+}

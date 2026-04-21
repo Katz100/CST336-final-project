@@ -274,17 +274,6 @@ app.get('/doctorPortal', isAuthenticated, isDoctor, async (req, res) => {
             [doctor_id]
         );
 
-        // Format birthdates
-        patients.forEach(p => {
-            if (p.birthdate) {
-                const date = new Date(p.birthdate);
-                const month = String(date.getMonth() + 1).padStart(2, "0");
-                const day = String(date.getDate()).padStart(2, "0");
-                const year = date.getFullYear();
-                p.birthdate = `${month}/${day}/${year}`;
-            }
-        });
-
         res.render('doctor', {
             user: req.session.user,
             prescriptions,
@@ -368,6 +357,44 @@ app.get('/deletePrescription', isAuthenticated, isDoctor, async (req, res) => {
         console.error(err);
         res.status(500).send("Error deleting prescription");
     }
+});
+
+app.get('/viewPatient', isAuthenticated, isDoctor, async (req, res) => {
+    const doctor_id = req.session.user.id;
+    const patient_id = req.query.id;
+
+    try {
+        const [patients] = await pool.query(
+            get_doctors_patients,
+            [doctor_id]
+        );
+        const [prescriptions] = await pool.query(
+            get_patients_prescriptions,
+            [patient_id]
+        );
+        // Format birthdates
+        patients.forEach(p => {
+            if (p.birthdate) {
+                const date = new Date(p.birthdate);
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+                const year = date.getFullYear();
+                p.birthdate = `${month}/${day}/${year}`;
+            }
+        });
+
+        const patient = patients.find(p => p.user_id == patient_id);
+
+        res.render('viewPatient', {
+            user: req.session.user,
+            patient,
+            prescriptions
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading patient information");
+    }
+    
 });
 
 
