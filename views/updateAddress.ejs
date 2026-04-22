@@ -44,13 +44,14 @@
                 value="<%= patient ? patient.state : '' %>" 
                 required
             >
-            <button class="signup-btn"> Update Address </button>
+            <button id="update-btn" class="signup-btn"> Update Address </button>
     </div>
     </div>
 
         <script>
-        document.getElementById("update-btn").addEventListener("click", () => {
-            if (confirm("Is the below information correct?")) {
+        document.getElementById("update-btn").addEventListener("click", function(e) {
+            const confirmed = confirm("Please confirm address is correct before proceeding.");
+            if (!confirmed) {
                 e.preventDefault();
             }
         });
