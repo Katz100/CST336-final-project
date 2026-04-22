@@ -100,11 +100,21 @@ const get_single_prescription = `
     WHERE p.id = ?
 `;
 
+const get_patients_address = `
+    SELECT street, city, state, zipcode
+    FROM patient
+    WHERE user_id = ?`;
+
 const update_prescription = `
     UPDATE prescription
     SET patient_id = ?, drug_name = ?, refills = ?
     WHERE id = ?
 `;
+
+const update_address = `
+    UPDATE patient
+    SET street = ?, city = ?, state = ?, zipcode = ?
+    WHERE user_id = ?`
 
 
 
@@ -174,7 +184,7 @@ app.post('/signUp', async function(req, res) {
 
             if (!street || !city || !state || !zipcode || !doctorId) {
                 return res.send("Patient fields are required.");
-            }
+        }
 
             await pool.query(add_new_patient, [
                 userId,
@@ -220,6 +230,9 @@ app.post('/login', async (req, res) => {
     let passwordHash = rows[0].password;
     let match = await bcrypt.compare(password, passwordHash);
 
+    console.log(rows[0]);
+
+
     if (match) {
         req.session.authenticated = true;
         req.session.user = rows[0];
@@ -250,12 +263,19 @@ app.get('/patientPortal', isAuthenticated, isPatient, async (req, res) => {
             [userId]
         );
 
+        const [patientRows] = await pool.query(
+            get_patients_address,
+            [userId]
+        )
+
         const doctor = doctorRows.length > 0 ? doctorRows[0] : null;
+        const patient = patientRows.length > 0 ? patientRows[0] : null;
 
         res.render('patient', {
             user: req.session.user,
             prescriptions,
-            doctor
+            doctor,
+            patient
         });
 
     } catch (err) {
@@ -400,6 +420,46 @@ app.get('/viewPatient', isAuthenticated, isDoctor, async (req, res) => {
         res.status(500).send("Error loading patient information");
     }
     
+});
+
+app.get("/updateAddress", isAuthenticated, isPatient, async (req, res) => {
+    const userId = req.session.user.id;
+    try {
+        const [patientRows] = await pool.query(
+            get_patients_address,
+            [userId]
+        );
+        const patient = patientRows.length > 0 ? patientRows[0] : null;
+
+
+        console.log("Patient:", patient);
+
+        res.render('updateAddress', {
+            user: req.session.user,
+            patient
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading patient information");
+    }
+});
+
+app.post('/updateAddress', isAuthenticated, isPatient, async (req, res) => {
+    const userId = req.session.user.id;
+    const { street, city, state, zipcode } = req.body;
+
+    try {
+        await pool.query(
+            update_address,
+            [street, city, state, zipcode, userId]
+        );
+        res.redirect('/patientPortal');
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error updating address");
+    }
 });
 
 

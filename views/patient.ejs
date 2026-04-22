@@ -21,6 +21,20 @@
             <h2>Welcome, <%= user ? user.first_name : "Patient" %>!</h2>
             <p>Here you can view your prescriptions and doctor information.</p>
         </section>
+        <section class="personal-info">
+            <p><h3>Personal Information</h3></p>
+
+            <div class = "info-row">
+                <img src="/img/no-icon.png" width = 150>
+                
+                <div class = "address-block">
+                    <h4> Address: </h4>
+                    <%= patient.street %>
+                    <p> <%= patient.city %>, <%= patient.state %> <%=patient.zipcode%> </p>
+                    <a href = "/updateAddress"> <button> Update Address </button> </a>
+                </div>
+            </div>
+        </section>
 
         <main class="dashboard">
 
